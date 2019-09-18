@@ -1,0 +1,34 @@
+[
+	{"question": "Combien a coûté le plus gros bathr du monde ?",
+	 "reponse": "24'000$",
+	 "propositions": ["24'000$", "28'000$", "30'000$", "21'000$"]
+	},
+	{"question": "Dans quel donjon le jarl de Blancherive t'envoie récupérer la première pierre de dragon ?",
+	 "reponse": "Tertre des chutes tourmentées",
+	 "propositions": ["Tertre des chutes tourmentées", "Vif de Rannveig", "Saarthal", "Cairn des Poussiéreux"]
+	},
+	{"question": "Quelle est la capitale du Kirghizstan ?",
+	 "reponse": "Bichkek",
+	 "propositions": ["Bichkek", "Achgabat", "Noursoultan", "Almaty"]
+	},
+	{"question": "Quelle est la capitale du Kazakhstan ?",
+	 "reponse": "Noursoultan",
+	 "propositions": ["Noursoultan", "Astana", "Almaty", "Bakou"]
+	},
+	{"question": "Combien de chocolat Mon chéri(trademark) un homme devrait-il manger pour dépasser la limite légale de 0.5 gr d'alcool par litre de sang ?",
+	 "reponse": "35",
+	 "propositions": ["35", "12", "20", "45"]
+	},
+	{"question": "Comment appelle t'on une image que l'on voit en relief lorsqu'on la regarde en louchant ?",
+	 "reponse": "Un autostéréograme",
+	 "propositions": ["Un autostéréograme", "Un stéréoglyphe", "Un stéréograme", "Un autostéréoglyphe"]
+	},
+	{"question": "En quelle année est sorti Minecraft ?",
+	 "reponse": "2009",
+	 "propositions": ["2009", "2008", "2010", "2011"]
+	},
+	{"question": "A quel âge Robin aura son bachelor ?",
+	 "reponse": "85 ans",
+	 "propositions": ["85 ans", "25 ans", "30 ans", "42 ans"]
+	}
+]
