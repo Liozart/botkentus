@@ -369,4 +369,4 @@ function getNamesFile(){
     });
 }
 
-client.login('NjE2OTM0OTg0NDg1NDM3NDYx.XWkCRg.-jAuADUz595Eflq2Sqw5io9e5U0');
+client.login('');
