@@ -23,12 +23,8 @@
 	 "reponse": "Un autostéréograme",
 	 "propositions": ["Un autostéréograme", "Un stéréoglyphe", "Un stéréograme", "Un autostéréoglyphe"]
 	},
-	{"question": "En quelle année est sorti Minecraft ?",
+	{"question": "En quelle année a commencé Minecraft ?",
 	 "reponse": "2009",
 	 "propositions": ["2009", "2008", "2010", "2011"]
-	},
-	{"question": "A quel âge Robin aura son bachelor ?",
-	 "reponse": "85 ans",
-	 "propositions": ["85 ans", "25 ans", "30 ans", "42 ans"]
 	}
 ]
