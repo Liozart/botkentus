@@ -467,4 +467,4 @@ function getKentusFoucaultFile(){
     });
 }
 
-client.login('NjE2OTM0OTg0NDg1NDM3NDYx.XYNd1w.KT9jXN9XVxnUCfT0jzdDelbcNvQ');
+client.login('CLIENT-TOKEN');
