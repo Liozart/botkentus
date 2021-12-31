@@ -18,7 +18,7 @@ var server;
 var memeChannelId = 748881106694176850;
 var memeChannelDebugOutputId = 893833370348429332;
 
-var DEBUG = true;
+var DEBUG = false;
 
 var memeChannel, memeChannelDebugOutput;
 var memeJob, cleanJob, leaderboardJob;
@@ -138,11 +138,17 @@ function sendRandomFileFromDate(msgOffsetId, aDate, putInArray)
                             sentMemesIndex.set(dateid, []);
                         console.log(sentMemesIndex);
                         console.log("--------------------------------");
-                        if (sentMemesIndex.get(dateid).includes(rand))
+                        if (sentMemesIndex.get(dateid).includes(rand) && sentMemesIndex.get(dateid).length >= msgCount)
                             put = false;
                         else
+                        {
+                            while (sentMemesIndex.get(dateid).includes(rand) && sentMemesIndex.get(dateid).length < msgCount)
+                            {
+                                rand = Math.floor(Math.random() * msgCount);
+                            }
                             sentMemesIndex.get(dateid).push(rand);
-                        console.log(sentMemesIndex);
+                            console.log(sentMemesIndex);
+                        }
                     }
 
                     if (put)
@@ -467,4 +473,4 @@ function getKentusFoucaultFile(){
     });
 }
 
-client.login('CLIENT-TOKEN');
+client.login('NjE2OTM0OTg0NDg1NDM3NDYx.XWjzeg.6-XMxDDNGOqaNeRKyXR1kjIOJDM');
