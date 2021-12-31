@@ -4,6 +4,7 @@ var cron = require("cron");
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const emojiCharacters = require('./emojiCharacters');
+const token = require('./token');
 
 var questions = [];
 var questionstate = false;
@@ -473,4 +474,4 @@ function getKentusFoucaultFile(){
     });
 }
 
-client.login('NjE2OTM0OTg0NDg1NDM3NDYx.XWjzeg.6-XMxDDNGOqaNeRKyXR1kjIOJDM');
+client.login(token.token);
