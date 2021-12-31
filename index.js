@@ -435,10 +435,10 @@ client.on('message', async msg => {
     if (msg.content == "A" || msg.content == "B" || msg.content == "C" || msg.content == "D") {
         if (questionstate) {
             var id;
-            if (msg.content == "A") id = 0;
-            if (msg.content == "B") id = 1;
-            if (msg.content == "C") id = 2;
-            if (msg.content == "D") id = 3;
+            if (msg.content == "A").upper() id = 0;
+            if (msg.content == "B").upper() id = 1;
+            if (msg.content == "C").upper() id = 2;
+            if (msg.content == "D").upper() id = 3;
             var rep;
             if (!wasRemote) {
                 rep = questions[currentQuestionIndex].reponse;
