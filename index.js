@@ -5,12 +5,15 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 const emojiCharacters = require('./emojiCharacters');
 const token = require('./token');
+const ytdl = require('ytdl-core');
 
 var DEBUG = false;
 
 var server;
 var memeChannelId = 748881106694176850;
 var memeChannelDebugOutputId = 893833370348429332;
+var botMusicChannelId = 735787218127421550;
+var commielandChannelId = 819571978271981578;
 
 var commandsArray = [
      {
@@ -24,11 +27,15 @@ var commandsArray = [
      {
         name: "<:seb:622819275874369546> kentusf",
         value: "The game"
-     },
-     {
+    },
+    {
         name: "<:seb:622819275874369546> kentusb",
         value: "Affiche le leaderboard de bathr"
-     }
+    },
+    {
+        name: "<:seb:622819275874369546> kentusmusic",
+        value: "La musique du tiesk"
+    }
 ];
 
 var questions = [];
@@ -41,7 +48,7 @@ var currentRemoteResponseArray = [];
 var wasRemote = false;
 var respChars = ["A", "B", "C", "D"];
 
-var memeChannel, memeChannelDebugOutput;
+var memeChannel, memeChannelDebugOutput, botMusicChannel, commielandChannel;
 var memeJob, cleanJob, leaderboardJob;
 
 var bathrArray = [];
@@ -64,6 +71,12 @@ client.on('ready', () => {
 				memeChannel = channel;
             if (channel.id == memeChannelDebugOutputId)
                 memeChannelDebugOutput = channel;
+            if (channel.id == botMusicChannelId)
+                botMusicChannel = channel;
+            if (channel.id == commielandChannelId)
+                commielandChannel = channel;
+            
+            
         });
     });
     console.log(" -------------- Logged in as " + client.user.username + " in " + server + " -------------- ");
@@ -328,7 +341,23 @@ function DisplayBathr(channel)
     }});
 }
 
+function PlayMusic(author) {
+    /*botMusicChannel.startTyping();
+    botMusicChannel.send("kentusplay https://www.youtube.com/watch?v=VAa7fnvhryw");
+    botMusicChannel.stopTyping();*/
+    author.voiceChannel.join().then(
+        connection => {
+            connection.playStream(ytdl('https://www.youtube.com/watch?v=VAa7fnvhryw', { filter: 'audioonly' }));
+        }
+    );
+    
+}
+
 client.on('message', async msg => {
+    //kentus Music
+    if (msg.content.includes("kentusmusic")) {
+        PlayMusic(msg.member);
+    }
     //kentus Meme
     if (msg.content.includes("kentusmeme"))
     {
