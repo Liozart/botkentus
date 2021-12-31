@@ -432,7 +432,7 @@ client.on('message', async msg => {
             msg.channel.send("Une question est en cours");
     }
     //Kentus veut gagner des millions - réponse
-    if (msg.content == "A" || msg.content == "B" || msg.content == "C" || msg.content == "D") {
+    if (msg.content.upper()  == "A" || msg.content.upper()  == "B" || msg.content.upper()  == "C" || msg.content.upper()  == "D") {
         if (questionstate) {
             var id;
             if (msg.content == "A").upper() id = 0;
