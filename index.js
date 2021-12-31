@@ -433,13 +433,13 @@ client.on('message', async msg => {
             msg.channel.send("Une question est en cours");
     }
     //Kentus veut gagner des millions - réponse
-    if (msg.content.upper()  == "A" || msg.content.upper()  == "B" || msg.content.upper()  == "C" || msg.content.upper()  == "D") {
+    if (msg.content.toUpperCase()  == "A" || msg.content.toUpperCase()  == "B" || msg.content.toUpperCase()  == "C" || msg.content.toUpperCase()  == "D") {
         if (questionstate) {
             var id;
-            if (msg.content.upper() == "A") id = 0;
-            if (msg.content.upper() == "B") id = 1;
-            if (msg.content.upper() == "C") id = 2;
-            if (msg.content.upper() == "D") id = 3;
+            if (msg.content.toUpperCase() == "A") id = 0;
+            if (msg.content.toUpperCase() == "B") id = 1;
+            if (msg.content.toUpperCase() == "C") id = 2;
+            if (msg.content.toUpperCase() == "D") id = 3;
             var rep;
             if (!wasRemote) {
                 rep = questions[currentQuestionIndex].reponse;
