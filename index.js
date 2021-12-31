@@ -6,6 +6,8 @@ const client = new Discord.Client();
 const emojiCharacters = require('./emojiCharacters');
 const token = require('./token');
 
+var bathrArray = [];
+
 var questions = [];
 var questionstate = false;
 var currentQuestionIndex = -1;
@@ -29,6 +31,7 @@ var emojiChannel = [617457210645282818, 748902332690858096, 748881106694176850];
 var allEmojis;
 
 getKentusFoucaultFile();
+checkIfCurrencyFileExists();
 
 client.on('ready', () => {
     client.user.setActivity('kentushelp', { type: 'PLAYING' });
@@ -135,7 +138,7 @@ function sendRandomFileFromDate(msgOffsetId, aDate, putInArray)
                     if (putInArray)
                     {
                         var dateid = aDate.getDate() + "." + aDate.getMonth() + "." + aDate.getFullYear();
-                        if (sentMemesIndex.get(dateid) == undefined)
+                        if (!sentMemesIndex.has(dateid))
                             sentMemesIndex.set(dateid, []);
                         console.log(sentMemesIndex);
                         console.log("--------------------------------");
@@ -256,14 +259,14 @@ function CountEmojis(msgOffsetId, aMonthAgo)
                 var emo = [];
                 em.forEach(s => { emo.push(rx2.exec(s)); });
                 emo.forEach(id => {
-                    if (allEmojis.get(id) == undefined)
+                    if (!allEmojis.has(id))
                         allEmojis.set(id, 1);
                     else
                         allEmojis.set(id, allEmojis.get(id) + 1);
                  });
             }
             msg.reactions.forEach(reac => {
-                if (allEmojis.get(reac.emoji.id) == undefined)
+                if (!allEmojis.has(reac.emoji.id))
                     allEmojis.set(reac.emoji.id, 1);
                 else
                     allEmojis.set(reac.emoji.id, allEmojis.get(reac.emoji.id) + 1);
@@ -293,6 +296,20 @@ function CountEmojis(msgOffsetId, aMonthAgo)
     });
 }
 
+function DisplayBathr(channel)
+{
+    var f = [];
+    bathrArray.forEach(e => {
+        f.push({name: e.name, value: e.bathr});
+    });
+    console.log(" - Bathr Board");
+    console.log(f);
+    channel.send({embed: { color: 2544665,
+        title: "Bathr",
+        fields: f
+    }});
+}
+
 client.on('message', async msg => {
     //kentus Meme
     if (msg.content.includes("kentusmeme"))
@@ -304,6 +321,11 @@ client.on('message', async msg => {
     if (msg.content.includes("kentuslead"))
     {
         DisplayEmojiLeaderBoard();
+    }
+    //kentus bathr Leaderboard
+    if (msg.content.includes("kentusb"))
+    {
+        DisplayBathr(msg.channel);
     }
     //Kentus help
     if (msg.content.includes("kentushelp")) {
@@ -325,7 +347,11 @@ client.on('message', async msg => {
              {
                 name: "<:seb:622819275874369546> kentusf",
                 value: "The game"
-             }]
+             },
+             {
+                name: "<:seb:622819275874369546> kentusb",
+                value: "Affiche le leaderboard de bathr"
+             },]
         }});
     }
     //Bathr emoji
@@ -387,7 +413,6 @@ client.on('message', async msg => {
             else
             {
                 var remotequest = JSON.parse(body);
-                console.log(remotequest);
                 currentRemoteResponse = remotequest.results[0].correct_answer;
                 currentRemoteResponseArray = remotequest.results[0].incorrect_answers;
                 currentRemoteResponseArray.push(currentRemoteResponse);
@@ -395,8 +420,20 @@ client.on('message', async msg => {
                 remotequest.results[0].question = remotequest.results[0].question.replace(/&quot;/g, '"');
                 remotequest.results[0].question = remotequest.results[0].question.replace(/&amp;/g, '&');
                 remotequest.results[0].question = remotequest.results[0].question.replace(/&#039;/g, "'");
+                remotequest.results[0].question = remotequest.results[0].question.replace(/&eacute;/g, "é");
+                remotequest.results[0].question = remotequest.results[0].question.replace(/&reg;/g, "®");
+                remotequest.results[0].question = remotequest.results[0].question.replace(/&trade;/g, "™");
                 currentRemoteResponse = currentRemoteResponse.replace(/&quot;/g, '"');
-                currentRemoteResponseArray.forEach(s => { s = s.replace(/&quot;/g, '"'); });
+                currentRemoteResponseArray.forEach(s =>
+                {
+                    s = s.replace(/&quot;/g, '"');
+                    s = s.replace(/&amp;/g, '&');
+                    s = s.replace(/&#039;/g, "'");
+                    s = s.replace(/&eacute;/g, "é");
+                    s = s.replace(/&reg;/g, "®");
+                    s = s.replace(/&trade;/g, "™");
+
+                });
 
                 //Suffle array
                 var currentIndex = currentRemoteResponseArray.length, temporaryValue, randomIndex;
@@ -440,14 +477,15 @@ client.on('message', async msg => {
             if (msg.content.toUpperCase() == "B") id = 1;
             if (msg.content.toUpperCase() == "C") id = 2;
             if (msg.content.toUpperCase() == "D") id = 3;
-            var rep;
+            var rep, win = true;
             if (!wasRemote) {
                 rep = questions[currentQuestionIndex].reponse;
                 if (rep == currentResponseArray[id]) {
-                msg.channel.send(msg.author.username + " a win le game (+420 de bathr)");
+                    msg.channel.send(msg.author.username + " a win le game (+420 de bathr)");
                 }
                 else {
-                    msg.channel.send("Je te prends ta bathr espèce d'ignare");
+                    win = false;
+                    msg.channel.send("No bathr 4 u");
                 }
             }
             else {
@@ -456,13 +494,36 @@ client.on('message', async msg => {
                     msg.channel.send(msg.author.username + " a win le game (+420 de bathr)");
                 }
                 else {
-                    msg.channel.send("Je te prends ta bathr espèce d'ignare");
+                    win = false;
+                    msg.channel.send("No bathr 4 u");
                 }
             }
+            if (win)
+                WriteBathrChanges(msg.author.username, 420);
+            else
+                WriteBathrChanges(msg.author.username, 0);
         }
     questionstate = false;
     }
 });
+
+function WriteBathrChanges(name, bathr)
+{
+    var inArr = false;
+    bathrArray.forEach(e => {
+        if (e.name == name)
+        {
+            inArr = true;
+            e.bathr = e.bathr + 420;
+        }
+    });
+    if (!inArr)
+        bathrArray.push({name : name, bathr : bathr});
+     console.log(bathrArray);
+    fs.writeFile('currency.json', JSON.stringify(bathrArray), err => {
+        if (err) throw err;
+    });
+}
 
 function getKentusFoucaultFile(){
     fs.exists('questions.json', function(yes) {
@@ -471,6 +532,16 @@ function getKentusFoucaultFile(){
                 if (!err)
                     questions = JSON.parse(data);
         });
+    });
+}
+
+function checkIfCurrencyFileExists() {
+    fs.exists('currency.json', function(yes) {
+        if (yes)
+            fs.readFile('currency.json', function readFileCallback(err, data) {
+                if (!err)
+                    bathrArray = JSON.parse(data);
+            });
     });
 }
 
