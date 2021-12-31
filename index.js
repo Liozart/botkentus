@@ -6,7 +6,30 @@ const client = new Discord.Client();
 const emojiCharacters = require('./emojiCharacters');
 const token = require('./token');
 
-var bathrArray = [];
+var DEBUG = false;
+
+var server;
+var memeChannelId = 748881106694176850;
+var memeChannelDebugOutputId = 893833370348429332;
+
+var commandsArray = [
+     {
+        name: "<:seb:622819275874369546> kentusmeme xx/xx/xxxx",
+        value: "Un meme de la date demandée, par ex. 16/01/2021"
+     },
+     {
+        name: "<:seb:622819275874369546> kentuslead",
+        value: "Affiche le leaderboard des reactions du mois"
+     },
+     {
+        name: "<:seb:622819275874369546> kentusf",
+        value: "The game"
+     },
+     {
+        name: "<:seb:622819275874369546> kentusb",
+        value: "Affiche le leaderboard de bathr"
+     }
+];
 
 var questions = [];
 var questionstate = false;
@@ -16,24 +39,22 @@ var remoteQuestionsURL = 'https://opentdb.com/api.php?amount=1&category=15&type=
 var currentRemoteResponse = "";
 var currentRemoteResponseArray = [];
 var wasRemote = false;
-
-var server;
-var memeChannelId = 748881106694176850;
-var memeChannelDebugOutputId = 893833370348429332;
-
-var DEBUG = false;
+var respChars = ["A", "B", "C", "D"];
 
 var memeChannel, memeChannelDebugOutput;
 var memeJob, cleanJob, leaderboardJob;
+
+var bathrArray = [];
 var sentMemesIndex = new Map();
 
 var emojiChannel = [617457210645282818, 748902332690858096, 748881106694176850];
 var allEmojis;
 
-getKentusFoucaultFile();
-checkIfCurrencyFileExists();
-
 client.on('ready', () => {
+
+    getKentusFoucaultFile();
+    checkIfCurrencyFileExists();
+
     client.user.setActivity('kentushelp', { type: 'PLAYING' });
 	client.guilds.forEach((guild) => {
         server = guild;
@@ -140,7 +161,6 @@ function sendRandomFileFromDate(msgOffsetId, aDate, putInArray)
                         var dateid = aDate.getDate() + "." + aDate.getMonth() + "." + aDate.getFullYear();
                         if (!sentMemesIndex.has(dateid))
                             sentMemesIndex.set(dateid, []);
-                        console.log(sentMemesIndex);
                         console.log("--------------------------------");
                         if (sentMemesIndex.get(dateid).includes(rand) && sentMemesIndex.get(dateid).length >= msgCount)
                             put = false;
@@ -151,7 +171,6 @@ function sendRandomFileFromDate(msgOffsetId, aDate, putInArray)
                                 rand = Math.floor(Math.random() * msgCount);
                             }
                             sentMemesIndex.get(dateid).push(rand);
-                            console.log(sentMemesIndex);
                         }
                     }
 
@@ -303,7 +322,6 @@ function DisplayBathr(channel)
         f.push({name: e.name, value: e.bathr});
     });
     console.log(" - Bathr Board");
-    console.log(f);
     channel.send({embed: { color: 2544665,
         title: "Bathr",
         fields: f
@@ -335,23 +353,7 @@ client.on('message', async msg => {
                 icon_url: client.avatarURL
             },
             title: "Commandes",
-            fields: [
-             {
-                name: "<:seb:622819275874369546> kentusmeme xx/xx/xxxx",
-                value: "Un meme de la date demandée, par ex. 16/01/2021"
-             },
-             {
-                name: "<:seb:622819275874369546> kentuslead",
-                value: "Affiche le leaderboard des reactions du mois"
-             },
-             {
-                name: "<:seb:622819275874369546> kentusf",
-                value: "The game"
-             },
-             {
-                name: "<:seb:622819275874369546> kentusb",
-                value: "Affiche le leaderboard de bathr"
-             },]
+            fields: commandsArray
         }});
     }
     //Bathr emoji
@@ -387,24 +389,14 @@ client.on('message', async msg => {
                         randarr[currentIndex] = randarr[randomIndex];
                         randarr[randomIndex] = temporaryValue;
                     }
+
+                    var f = [];
+                    for (var i = 0; i < 4; i++)
+                        f.push({name: respChars[i] + " - " + randarr[i], value: " --- "});
+
                     msg.channel.send({embed: { color: 3447003,
                         title: "Question : " + questions[currentQuestionIndex].question,
-                        fields: [{
-                            name: "A - " + randarr[0],
-                            value: " --- "
-                         },
-                         {
-                            name: "B - " + randarr[1],
-                            value: " --- "
-                         },
-                         {
-                            name: "C - " + randarr[2],
-                            value: " --- "
-                         },
-                          {
-                            name: "D - " + randarr[3],
-                            value: " --- "
-                         }]
+                        fields: f
                     }});
                 currentResponseArray = randarr;
                 wasRemote = false;
@@ -417,23 +409,9 @@ client.on('message', async msg => {
                 currentRemoteResponseArray = remotequest.results[0].incorrect_answers;
                 currentRemoteResponseArray.push(currentRemoteResponse);
 
-                remotequest.results[0].question = remotequest.results[0].question.replace(/&quot;/g, '"');
-                remotequest.results[0].question = remotequest.results[0].question.replace(/&amp;/g, '&');
-                remotequest.results[0].question = remotequest.results[0].question.replace(/&#039;/g, "'");
-                remotequest.results[0].question = remotequest.results[0].question.replace(/&eacute;/g, "é");
-                remotequest.results[0].question = remotequest.results[0].question.replace(/&reg;/g, "®");
-                remotequest.results[0].question = remotequest.results[0].question.replace(/&trade;/g, "™");
-                currentRemoteResponse = currentRemoteResponse.replace(/&quot;/g, '"');
-                currentRemoteResponseArray.forEach(s =>
-                {
-                    s = s.replace(/&quot;/g, '"');
-                    s = s.replace(/&amp;/g, '&');
-                    s = s.replace(/&#039;/g, "'");
-                    s = s.replace(/&eacute;/g, "é");
-                    s = s.replace(/&reg;/g, "®");
-                    s = s.replace(/&trade;/g, "™");
-
-                });
+                remotequest.results[0].question = ReplaceHTMLChars(remotequest.results[0].question);
+                currentRemoteResponse = ReplaceHTMLChars(currentRemoteResponse);
+                currentRemoteResponseArray.forEach(s => { s = ReplaceHTMLChars(s); });
 
                 //Suffle array
                 var currentIndex = currentRemoteResponseArray.length, temporaryValue, randomIndex;
@@ -444,24 +422,14 @@ client.on('message', async msg => {
                     currentRemoteResponseArray[currentIndex] = currentRemoteResponseArray[randomIndex];
                     currentRemoteResponseArray[randomIndex] = temporaryValue;
                 }
+
+                var f = [];
+                for (var i = 0; i < 4; i++)
+                    f.push({name: respChars[i] + " - " + currentRemoteResponseArray[i], value: " --- "});
+
                 msg.channel.send({embed: { color: 3447003,
                     title: "Question : " + remotequest.results[0].question,
-                    fields: [{
-                        name: "A - " + currentRemoteResponseArray[0],
-                        value: " --- "
-                     },
-                     {
-                        name: "B - " + currentRemoteResponseArray[1],
-                        value: " --- "
-                     },
-                     {
-                        name: "C - " + currentRemoteResponseArray[2],
-                        value: " --- "
-                     },
-                      {
-                        name: "D - " + currentRemoteResponseArray[3],
-                        value: " --- "
-                     }]
+                    fields: f
                 }});
                 wasRemote = true;
             }});
@@ -507,6 +475,17 @@ client.on('message', async msg => {
     }
 });
 
+function ReplaceHTMLChars(s)
+{
+    s = s.replace(/&quot;/g, '"');
+    s = s.replace(/&amp;/g, '&');
+    s = s.replace(/&#039;/g, "'");
+    s = s.replace(/&eacute;/g, "é");
+    s = s.replace(/&reg;/g, "®");
+    s = s.replace(/&trade;/g, "™");
+    return s;
+}
+
 function WriteBathrChanges(name, bathr)
 {
     var inArr = false;
@@ -519,7 +498,6 @@ function WriteBathrChanges(name, bathr)
     });
     if (!inArr)
         bathrArray.push({name : name, bathr : bathr});
-     console.log(bathrArray);
     fs.writeFile('currency.json', JSON.stringify(bathrArray), err => {
         if (err) throw err;
     });
