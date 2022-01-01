@@ -6,6 +6,7 @@ const client = new Discord.Client();
 const emojiCharacters = require('./emojiCharacters');
 const token = require('./token');
 const ytdl = require('ytdl-core');
+const yts = require('youtube-search-without-api-key');
 
 var DEBUG = false;
 
@@ -33,7 +34,7 @@ var commandsArray = [
         value: "Affiche le leaderboard de bathr"
     },
     {
-        name: "<:seb:622819275874369546> kentusmusic",
+        name: "<:seb:622819275874369546> kblini [Lien]",
         value: "La musique du tiesk"
     }
 ];
@@ -130,6 +131,7 @@ function GetMemeFromDate(msg)
     date.setFullYear(y);
 
     console.log(" - Getting memes from " + date);
+
     memeChannel.startTyping();
     sendRandomFileFromDate(msgOffsetId, date, true);
     memeChannel.stopTyping();
@@ -140,6 +142,7 @@ function GetMemeFromAYearAgo()
     var msgOffsetId = memeChannel.lastMessageID;
     var aYearAgo = new Date();
     aYearAgo.setFullYear(aYearAgo.getFullYear() - 1);
+
     console.log(" - Getting memes from " + aYearAgo);
 
     memeChannel.startTyping();
@@ -151,6 +154,7 @@ function sendRandomFileFromDate(msgOffsetId, aDate, putInArray)
 {
     var msgLimit = 100;
     var put = true;
+
     memeChannel.fetchMessages({limit: msgLimit, before: msgOffsetId}).then(messages => {
         messages = messages.array();
         msgOffsetId = messages[msgLimit - 1].id;
@@ -162,6 +166,7 @@ function sendRandomFileFromDate(msgOffsetId, aDate, putInArray)
                 var messagesOfDayRest = messagesRest.filter(msg => msg.createdAt.getDate() == aDate.getDate());
                 messagesOfDay = messagesOfDayRest.concat(messagesOfDay);
                 var msgWithFiles = messagesOfDay.filter(msg => msg.attachments.size > 0);
+
                 var msgCount = 0, cnt = 0;
 
                 msgCount = msgWithFiles.length;
@@ -186,7 +191,6 @@ function sendRandomFileFromDate(msgOffsetId, aDate, putInArray)
                             sentMemesIndex.get(dateid).push(rand);
                         }
                     }
-
                     if (put)
                     {
                         msgWithFiles.forEach(msg => {
@@ -341,22 +345,44 @@ function DisplayBathr(channel)
     }});
 }
 
-function PlayMusic(author) {
-    /*botMusicChannel.startTyping();
-    botMusicChannel.send("kentusplay https://www.youtube.com/watch?v=VAa7fnvhryw");
-    botMusicChannel.stopTyping();*/
-    author.voiceChannel.join().then(
+function PlayMusic(msg) {
+    var ind = msg.content.indexOf("http"), link;
+    if (ind != -1)
+    {
+        link = msg.content.substr(ind);
+        msg.member.voiceChannel.join().then(
+            connection => {
+                const dispatcher = connection.playStream(ytdl(link, { filter: 'audioonly' }));
+
+                dispatcher.on("end", function() {
+                    msg.member.voiceChannel.leave();
+                });
+        });
+    }
+    else
+    {
+        link = msg.content.substr(7);
+        SearchAndLoadYT(link, msg.member.voiceChannel);
+    }
+}
+
+async function SearchAndLoadYT(keywords, channel)
+{
+    const videos = await yts.search(keywords);
+    channel.join().then(
         connection => {
-            connection.playStream(ytdl('https://www.youtube.com/watch?v=VAa7fnvhryw', { filter: 'audioonly' }));
-        }
-    );
-    
+            const dispatcher = connection.playStream(ytdl(videos[0].url, { filter: 'audioonly' }));
+
+            dispatcher.on("end", function() {
+                channel.leave();
+            });
+    });
 }
 
 client.on('message', async msg => {
     //kentus Music
-    if (msg.content.includes("kentusmusic")) {
-        PlayMusic(msg.member);
+    if (msg.content.includes("kblini")) {
+        PlayMusic(msg);
     }
     //kentus Meme
     if (msg.content.includes("kentusmeme"))
@@ -474,6 +500,7 @@ client.on('message', async msg => {
             if (msg.content.toUpperCase() == "B") id = 1;
             if (msg.content.toUpperCase() == "C") id = 2;
             if (msg.content.toUpperCase() == "D") id = 3;
+
             var rep, win = true;
             if (!wasRemote) {
                 rep = questions[currentQuestionIndex].reponse;
@@ -522,7 +549,7 @@ function WriteBathrChanges(name, bathr)
         if (e.name == name)
         {
             inArr = true;
-            e.bathr = e.bathr + 420;
+            e.bathr = e.bathr + bathr;
         }
     });
     if (!inArr)
