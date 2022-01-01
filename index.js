@@ -34,7 +34,7 @@ var commandsArray = [
         value: "Affiche le leaderboard de bathr"
     },
     {
-        name: "<:seb:622819275874369546> kblini [Lien]",
+        name: "<:seb:622819275874369546> kblini [Lien youtube/mots clés], knext, kstop",
         value: "La musique du tiesk"
     }
 ];
@@ -51,6 +51,11 @@ var respChars = ["A", "B", "C", "D"];
 
 var memeChannel, memeChannelDebugOutput, botMusicChannel, commielandChannel;
 var memeJob, cleanJob, leaderboardJob;
+
+var musicQueue = [];
+var dispatcher;
+var isPlayingMusic = false;
+var currentMusicChannel;
 
 var bathrArray = [];
 var sentMemesIndex = new Map();
@@ -345,44 +350,89 @@ function DisplayBathr(channel)
     }});
 }
 
-function PlayMusic(msg) {
+async function AddMusicToQueue(msg)
+{
     var ind = msg.content.indexOf("http"), link;
     if (ind != -1)
-    {
         link = msg.content.substr(ind);
-        msg.member.voiceChannel.join().then(
-            connection => {
-                const dispatcher = connection.playStream(ytdl(link, { filter: 'audioonly' }));
-
-                dispatcher.on("end", function() {
-                    msg.member.voiceChannel.leave();
-                });
-        });
-    }
     else
     {
         link = msg.content.substr(7);
-        SearchAndLoadYT(link, msg.member.voiceChannel);
+        const videos = await yts.search(link);
+        link = videos[0].url;
     }
+    musicQueue.push(link);
+
+    if (!isPlayingMusic)
+       StartPlayingMusic(msg.member.voiceChannel)
+
+    var f = [];
+    for (var i = 1; i < musicQueue.length; i++)
+        f.push({name: i, value: musicQueue[i]});
+
+    botMusicChannel.send({embed: { color: 9707214,
+        title: "Playing : " + musicQueue[0],
+        url: musicQueue[0],
+        description: "Queue : ",
+        fields: f
+    }});
 }
 
-async function SearchAndLoadYT(keywords, channel)
+async function StartPlayingMusic(channel)
 {
-    const videos = await yts.search(keywords);
     channel.join().then(
         connection => {
-            const dispatcher = connection.playStream(ytdl(videos[0].url, { filter: 'audioonly' }));
+            dispatcher = connection.playStream(ytdl(musicQueue[0], { filter: 'audioonly' }));
+            isPlayingMusic = true;
+            currentMusicChannel = channel;
 
             dispatcher.on("end", function() {
-                channel.leave();
+                musicQueue.shift();
+                if (musicQueue.length == 0)
+                {
+                    channel.leave();
+                    isPlayingMusic = false;
+                }
+                else
+                    StartPlayingMusic(channel);
             });
     });
+}
+
+function NextMusic()
+{
+    dispatcher.end();
+
+    var f = [];
+    for (var i = 1; i < musicQueue.length; i++)
+        f.push({name: i, value: musicQueue[i]});
+
+    botMusicChannel.send({embed: { color: 9707214,
+        title: "Playing : " + musicQueue[0],
+        url: musicQueue[0],
+        description: "Queue : ",
+        fields: f
+    }});
+}
+
+function StopMusic()
+{
+    currentMusicChannel.leave();
+    sPlayingMusic = false;
+    musicQueue = [];
+    dispatcher = null;
 }
 
 client.on('message', async msg => {
     //kentus Music
     if (msg.content.includes("kblini")) {
-        PlayMusic(msg);
+        AddMusicToQueue(msg);
+    }
+    if (msg.content == "knext") {
+        NextMusic();
+    }
+    if (msg.content == "kstop") {
+        StopMusic();
     }
     //kentus Meme
     if (msg.content.includes("kentusmeme"))
@@ -391,17 +441,17 @@ client.on('message', async msg => {
         msg.delete({ timeout: 50000 });
     }
     //kentus emoji Leaderboard
-    if (msg.content.includes("kentuslead"))
+    if (msg.content == "kentuslead")
     {
         DisplayEmojiLeaderBoard();
     }
     //kentus bathr Leaderboard
-    if (msg.content.includes("kentusb"))
+    if (msg.content == "kentusb")
     {
         DisplayBathr(msg.channel);
     }
     //Kentus help
-    if (msg.content.includes("kentushelp")) {
+    if (msg.content == "kentushelp") {
         msg.channel.send({embed: { color: 8447033,
             author: {
                 name: client.username,
