@@ -1,0 +1,30 @@
+{
+  "dependencies": {
+    "cron": "^1.8.2",
+    "discord.js": "^11.6.4",
+    "ffbinaries": "^1.1.4",
+    "ffmpeg": "^0.0.4",
+    "ffmpeg-static": "^4.4.0",
+    "fs": "^0.0.1-security",
+    "opusscript": "^0.0.6",
+    "request": "^2.88.2",
+    "ytdl-core": "^4.9.2"
+  },
+  "name": "botkentus",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Liozart/botkentus.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Liozart/botkentus/issues"
+  },
+  "homepage": "https://github.com/Liozart/botkentus#readme",
+  "description": ""
+}
