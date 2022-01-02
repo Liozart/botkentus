@@ -53,12 +53,14 @@ var memeChannel, memeChannelDebugOutput, botMusicChannel, commielandChannel;
 var memeJob, cleanJob, leaderboardJob;
 
 var musicQueue = [];
+var musicQueueNames = [];
 var dispatcher;
 var isPlayingMusic = false;
 var currentMusicChannel;
 
 var bathrArray = [];
 var sentMemesIndex = new Map();
+var moreMemeToday = true;
 
 var emojiChannel = [617457210645282818, 748902332690858096, 748881106694176850];
 var allEmojis;
@@ -100,6 +102,7 @@ client.on('ready', () => {
 function CleanIndexes()
 {
     sentMemesIndex = new Map();
+    moreMemeToday = true;
     console.log(" - Cleaning indexes");
 }
 
@@ -138,7 +141,7 @@ function GetMemeFromDate(msg)
     console.log(" - Getting memes from " + date);
 
     memeChannel.startTyping();
-    sendRandomFileFromDate(msgOffsetId, date, true);
+    sendRandomFileFromDate(msgOffsetId, date, true, false);
     memeChannel.stopTyping();
 }
 
@@ -151,11 +154,11 @@ function GetMemeFromAYearAgo()
     console.log(" - Getting memes from " + aYearAgo);
 
     memeChannel.startTyping();
-    sendRandomFileFromDate(msgOffsetId, aYearAgo, true);
+    sendRandomFileFromDate(msgOffsetId, aYearAgo, true, true);
     memeChannel.stopTyping();
 }
 
-function sendRandomFileFromDate(msgOffsetId, aDate, putInArray)
+function sendRandomFileFromDate(msgOffsetId, aDate, putInArray, isAutoJob)
 {
     var msgLimit = 100;
     var put = true;
@@ -225,6 +228,12 @@ function sendRandomFileFromDate(msgOffsetId, aDate, putInArray)
                     {
                         if (!DEBUG)
                         {
+                            if (isAutoJob)
+                                if (!moreMemeToday)
+                                    return;
+                                else
+                                    moreMemeToday = false;
+
                             memeChannel.send("Pas plus de maymays postés le " + aDate.getDate() + "/" +
                                                                        (aDate.getMonth() + 1) + "/" +
                                                                        aDate.getFullYear() + ".");
@@ -258,7 +267,7 @@ function sendRandomFileFromDate(msgOffsetId, aDate, putInArray)
             });
         }
         else
-            sendRandomFileFromDate(msgOffsetId, aDate, putInArray);
+            sendRandomFileFromDate(msgOffsetId, aDate, putInArray, isAutoJob);
     });
 }
 
@@ -352,30 +361,52 @@ function DisplayBathr(channel)
 
 async function AddMusicToQueue(msg)
 {
-    var ind = msg.content.indexOf("http"), link;
+    if (msg.member.voiceChannelID == undefined)
+        return;
+
+    var ind = msg.content.indexOf("http");
+    var link, name, tb;
     if (ind != -1)
-        link = msg.content.substr(ind);
+    {
+        link = msg.content.substr(msg.content.indexOf(" ") + 1);
+        name = msg.content.substr(7);
+    }
     else
     {
         link = msg.content.substr(7);
         const videos = await yts.search(link);
         link = videos[0].url;
+        name = videos[0].title;
     }
     musicQueue.push(link);
+    musicQueueNames.push(name);
 
     if (!isPlayingMusic)
        StartPlayingMusic(msg.member.voiceChannel)
 
     var f = [];
     for (var i = 1; i < musicQueue.length; i++)
-        f.push({name: i, value: musicQueue[i]});
+        f.push({name: i, value: musicQueueNames[i]});
 
-    botMusicChannel.send({embed: { color: 9707214,
-        title: "Playing : " + musicQueue[0],
-        url: musicQueue[0],
-        description: "Queue : ",
-        fields: f
-    }});
+    if (musicQueueNames[0].includes("http"))
+        musicQueueNames[0] = musicQueueNames[0].substr(24);
+
+    if (f.length > 0)
+    {
+        botMusicChannel.send({embed: { color: 9707214,
+            title: "Playing : " + musicQueueNames[0],
+            url: musicQueue[0],
+            description: "Queue : ",
+            fields: f
+        }});
+    }
+    else
+    {
+        botMusicChannel.send({embed: { color: 9707214,
+            title: "Playing : " + musicQueueNames[0],
+            url: musicQueue[0]
+        }});
+    }
 }
 
 async function StartPlayingMusic(channel)
@@ -388,6 +419,7 @@ async function StartPlayingMusic(channel)
 
             dispatcher.on("end", function() {
                 musicQueue.shift();
+                musicQueueNames.shift();
                 if (musicQueue.length == 0)
                 {
                     channel.leave();
@@ -405,14 +437,15 @@ function NextMusic()
 
     var f = [];
     for (var i = 1; i < musicQueue.length; i++)
-        f.push({name: i, value: musicQueue[i]});
+        f.push({name: i, value: musicQueueNames[i]});
 
-    botMusicChannel.send({embed: { color: 9707214,
-        title: "Playing : " + musicQueue[0],
-        url: musicQueue[0],
-        description: "Queue : ",
-        fields: f
-    }});
+    if (musicQueue.length > 0)
+        botMusicChannel.send({embed: { color: 9707214,
+            title: "Playing : " + musicQueueNames[0],
+            url: musicQueue[0],
+            description: "Queue : ",
+            fields: f
+        }});
 }
 
 function StopMusic()
@@ -420,6 +453,7 @@ function StopMusic()
     currentMusicChannel.leave();
     sPlayingMusic = false;
     musicQueue = [];
+    musicQueueNames = [];
     dispatcher = null;
 }
 
