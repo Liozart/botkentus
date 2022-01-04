@@ -232,12 +232,17 @@ function sendRandomFileFromDate(msgOffsetId, aDate, putInArray, isAutoJob)
                                 if (!moreMemeToday)
                                     return;
                                 else
+                                {
                                     moreMemeToday = false;
-
-                            memeChannel.send("Pas plus de maymays postés le " + aDate.getDate() + "/" +
-                                                                       (aDate.getMonth() + 1) + "/" +
-                                                                       aDate.getFullYear() + ".");
-                        }
+                                    memeChannel.send("Pas plus de maymays postés le " + aDate.getDate() + "/" +
+                                                                   (aDate.getMonth() + 1) + "/" +
+                                                                   aDate.getFullYear() + ".");
+                                }
+                            else
+                                memeChannel.send("Pas plus de maymays postés le " + aDate.getDate() + "/" +
+                                                               (aDate.getMonth() + 1) + "/" +
+                                                               aDate.getFullYear() + ".");
+                    }
                         else
                         {
                            memeChannelDebugOutput.send("Pas plus de maymays postés le " + aDate.getDate() + "/" +
