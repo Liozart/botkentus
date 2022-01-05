@@ -284,10 +284,6 @@ function CleanIndexes()
     console.log(" - Cleaning indexes");
 }
 
-function OptimizeMemesIds(msgOffsetId){
-    
-}
-
 /* Check date format and call GetMeme with the date*/
 function GetMemeFromDate(msg)
 {
@@ -343,7 +339,7 @@ function GetMemeFromAYearAgo()
     memeChannel.stopTyping();
     
 }
-
+/* handler to optimize dem memes */
 function sendRandomFileFromDateHandler(msgOffsetId, aDate, putInArray, isAutoJob){
     var tmpmsgid = msgOffsetId;
     optimizeIndexes.forEach(tmp => {
