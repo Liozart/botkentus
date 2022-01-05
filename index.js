@@ -61,9 +61,11 @@ var musicQueue = [];
 var musicQueueNames = [];
 var dispatcher;
 var isPlayingMusic = false;
+var refreshMemeOptimization = false;
 var currentMusicChannel;
 
 var bathrArray = [];
+var optimizeIndexes = [];
 var sentMemesIndex = new Map();
 var moreMemeToday = true;
 
@@ -76,6 +78,8 @@ client.on('ready', () => {
 
     getKentusFoucaultFile();
     checkIfCurrencyFileExists();
+    if(!refreshMemeOptimization)
+        checkIfOptimizeIndexesExists();
 
     client.user.setActivity('kentushelp', { type: 'PLAYING' });
 	client.guilds.forEach((guild) => {
@@ -280,6 +284,10 @@ function CleanIndexes()
     console.log(" - Cleaning indexes");
 }
 
+function OptimizeMemesIds(msgOffsetId){
+    
+}
+
 /* Check date format and call GetMeme with the date*/
 function GetMemeFromDate(msg)
 {
@@ -317,7 +325,7 @@ function GetMemeFromDate(msg)
 
     msg.delete({ timeout: 50000 });
     memeChannel.startTyping();
-    sendRandomFileFromDate(msgOffsetId, date, true, false);
+    sendRandomFileFromDateHandler(msgOffsetId, date, true, false);
     memeChannel.stopTyping();
 }
 
@@ -331,10 +339,22 @@ function GetMemeFromAYearAgo()
     console.log(" - Getting memes from " + aYearAgo);
 
     memeChannel.startTyping();
-    sendRandomFileFromDate(msgOffsetId, aYearAgo, true, true);
+    sendRandomFileFromDateHandler(msgOffsetId, aYearAgo, true, true);
     memeChannel.stopTyping();
+    
 }
 
+function sendRandomFileFromDateHandler(msgOffsetId, aDate, putInArray, isAutoJob){
+    var tmpmsgid = msgOffsetId;
+    optimizeIndexes.forEach(tmp => {
+        var tmpDate = new Date(tmp.date);
+        if(tmpDate < aDate)
+        {
+            tmpmsgid = tmp.snowflake;
+        }
+    });
+    sendRandomFileFromDate(tmpmsgid, aDate, putInArray, isAutoJob);
+}
 /* Send a random file from a specified day (recursive) */
 function sendRandomFileFromDate(msgOffsetId, aDate, putInArray, isAutoJob)
 {
@@ -344,6 +364,8 @@ function sendRandomFileFromDate(msgOffsetId, aDate, putInArray, isAutoJob)
     memeChannel.fetchMessages({limit: msgLimit, before: msgOffsetId}).then(messages => {
         messages = messages.array();
         msgOffsetId = messages[msgLimit - 1].id;
+        if (refreshMemeOptimization)
+            optimizeIndexes.push({snowflake : messages[msgLimit - 1].id, date : messages[msgLimit - 1].createdAt });
         if (messages[msgLimit - 1].createdAt.getTime() <= aDate.getTime())
         {
             memeChannel.fetchMessages({limit: msgLimit, before: msgOffsetId}).then(messagesRest => {
@@ -382,6 +404,8 @@ function sendRandomFileFromDate(msgOffsetId, aDate, putInArray, isAutoJob)
                         msgWithFiles.forEach(msg => {
                             if (cnt == rand && msg.author != client.user)
                             {
+                                if (refreshMemeOptimization)
+                                    writeOptimizationFile();
                                 console.log(" - URL : " + msg.attachments.first().url);
                                 if (!DEBUG)
                                 {
@@ -705,6 +729,24 @@ function checkIfCurrencyFileExists() {
                     bathrArray = JSON.parse(data);
             });
     });
+}
+
+/* Get bathr from file */
+function checkIfOptimizeIndexesExists() {
+    fs.exists('optimizeIndexes.json', function(yes) {
+        if (yes)
+            fs.readFile('optimizeIndexes.json', function readFileCallback(err, data) {
+                if (!err)
+                    optimizeIndexes = JSON.parse(data);
+            });
+    });
+}
+
+function writeOptimizationFile(){
+    fs.writeFile('optimizeIndexes.json', JSON.stringify(optimizeIndexes),(err) => {
+        if (err)
+          console.log(err);
+      });
 }
 
 /* ---------------------------- DISCORD BOT LAUNCH ----------------------------  */
