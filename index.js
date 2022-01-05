@@ -385,14 +385,10 @@ function sendRandomFileFromDate(msgOffsetId, aDate, putInArray, isAutoJob)
                                 console.log(" - URL : " + msg.attachments.first().url);
                                 if (!DEBUG)
                                 {
-                                    msg.reply("Random maymay du " + msg.createdAt.getDate() + "/" +
+									memeChannel.send("Random maymay du " + msg.createdAt.getDate() + "/" +
                                                                            (msg.createdAt.getMonth() + 1) + "/" +
                                                                            msg.createdAt.getFullYear() + ", par " + msg.author + ":",
-                                                                           {files: [msg.attachments.first().url]});
-									/*memeChannel.send("Random maymay du " + msg.createdAt.getDate() + "/" +
-                                                                           (msg.createdAt.getMonth() + 1) + "/" +
-                                                                           msg.createdAt.getFullYear() + ", par " + msg.author + ":",
-                                                                           {files: [msg.attachments.first().url]});	*/								   
+                                                                           {files: [msg.attachments.first().url]});								   
                                 }
                                 else
                                 {
