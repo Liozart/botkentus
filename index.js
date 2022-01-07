@@ -328,7 +328,7 @@ function GetMemeFromDate(msg)
     }
 
     date.setDate(d);
-    date.setMonth(m);
+    date.setMonth(m-1);
     date.setFullYear(y);
 
     console.log(" - Getting memes from " + date);
