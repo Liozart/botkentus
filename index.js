@@ -22,7 +22,7 @@ var commielandChannelId = 819571978271981578;
 
 var memeChannel, memeChannelDebugOutput, botMusicChannel, commielandChannel;
 
-var memeJob, cleanJob, leaderboardJob;
+var memeJob, cleanJob, leaderboardJob,optimizeJob;
 
 var commandsArray = [
      {
@@ -99,7 +99,12 @@ client.on('ready', () => {
         });
     });
     console.log(" -------------- Logged in as " + client.user.username + " in " + server + " -------------- ");
-
+	
+	
+	/* call OptimizeMemes once a week at 15h */
+	optimizeJob = new cron.CronJob('00 15 * * 0', OptimizeMemes);
+	optimizeJob.start();
+	
     /* Call GetMemeFromAYearAgo everyday at 09:00, 13:00 and 21:00 */
 	memeJob = new cron.CronJob('00 00 8,13,20 * * *', GetMemeFromAYearAgo);
 	memeJob.start();
@@ -276,6 +281,12 @@ client.on('message', async msg => {
 
 /* ----------------- MEME FUNCTIONS ----------------- */
 
+/* add the last message id from memechannel to the optimization file */
+function OptimizeMemes(){
+	optimizeIndexes.unshift({snowflake : memeChannel.lastMessage.id , date : memeChannel.lastMessage.createdAt});
+	writeOptimizationFile();
+}
+
 /* Reset indexes used with jobs */
 function CleanIndexes()
 {
@@ -314,7 +325,7 @@ function GetMemeFromDate(msg)
     }
 
     date.setDate(d);
-    date.setMonth(m - 1);
+    date.setMonth(m);
     date.setFullYear(y);
 
     console.log(" - Getting memes from " + date);
