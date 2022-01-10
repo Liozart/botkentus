@@ -376,8 +376,9 @@ function sendRandomFileFromDate(msgOffsetId, aDate, putInArray, isAutoJob)
                 msgCount = msgWithFiles.length;
                 if (msgCount > 0)
                 {
-                    console.log(" - " + msgCount + " messages that day.")
+                    console.log(" - " + msgCount + " messages that day.");
                     var rand = Math.floor(Math.random() * msgCount);
+                    var displayDate = aDate.getDate() + "/" + (parseInt(aDate.getMonth()) + 1) + "/" + aDate.getFullYear();
                     if (putInArray)
                     {
                         var dateid = aDate.getDate() + "." + aDate.getMonth() + "." + aDate.getFullYear();
@@ -405,16 +406,12 @@ function sendRandomFileFromDate(msgOffsetId, aDate, putInArray, isAutoJob)
                                 console.log(" - URL : " + msg.attachments.first().url);
                                 if (!DEBUG)
                                 {
-									memeChannel.send("Random maymay du " + msg.createdAt.getDate() + "/" +
-                                                                           (msg.createdAt.getMonth() + 1) + "/" +
-                                                                           msg.createdAt.getFullYear() + ", par " + msg.author + ":",
+									memeChannel.send("Random maymay du " + displayDate + ", par " + msg.author + ":",
                                                                            {files: [msg.attachments.first().url]});								   
                                 }
                                 else
                                 {
-                                    memeChannelDebugOutput.send("Random maymay du " + msg.createdAt.getDate() + "/" +
-                                                                           (msg.createdAt.getMonth() + 1) + "/" +
-                                                                           msg.createdAt.getFullYear() + ", par " + msg.author + ":",
+                                    memeChannelDebugOutput.send("Random maymay du " + displayDate + ", par " + msg.author + ":",
                                                                            {files: [msg.attachments.first().url]});
                                 }
 
@@ -431,21 +428,15 @@ function sendRandomFileFromDate(msgOffsetId, aDate, putInArray, isAutoJob)
                                 if (moreMemeToday)
                                 {
                                     moreMemeToday = false;
-                                    memeChannel.send("Pas plus de maymays postés le " + aDate.getDate() + "/" +
-                                                                   (aDate.getMonth() + 1) + "/" +
-                                                                   aDate.getFullYear() + ".");
+                                    memeChannel.send("Pas plus de maymays postés le " + displayDate + ".");
                                 }
                             }
                             else
-                                memeChannel.send("Pas plus de maymays postés le " + aDate.getDate() + "/" +
-                                                               (aDate.getMonth() + 1) + "/" +
-                                                               aDate.getFullYear() + ".");
+                                memeChannel.send("Pas plus de maymays postés le " + displayDate + ".");
                         }
                         else
                         {
-                           memeChannelDebugOutput.send("Pas plus de maymays postés le " + aDate.getDate() + "/" +
-                                                                       (aDate.getMonth() + 1) + "/" +
-                                                                       + aDate.getFullYear() + ".");
+                           memeChannelDebugOutput.send("Pas plus de maymays postés le " + displayDate + ".");
                         }
                         memeChannel.stopTyping();
                     }
@@ -455,15 +446,11 @@ function sendRandomFileFromDate(msgOffsetId, aDate, putInArray, isAutoJob)
                     console.log(" - No maymay today");
                     if (!DEBUG)
                     {
-                        memeChannel.send("Pas de maymays postés le " + aDate.getDate() + "/" +
-                                                                   (aDate.getMonth() + 1) + "/" +
-                                                                   aDate.getFullYear() + ". TRISTESSE");
+                        memeChannel.send("Pas de maymays postés le " + displayDate + ". TRISTESSE");
                     }
                     else
                     {
-                       memeChannelDebugOutput.send("Pas de maymays postés le " + aDate.getDate() + "/" +
-                                                                   (aDate.getMonth() + 1) + "/" +
-                                                                   + aDate.getFullYear() + ". TRISTESSE");
+                       memeChannelDebugOutput.send("Pas de maymays postés le " + displayDate + ". TRISTESSE");
                     }
                     memeChannel.stopTyping();
                 }
