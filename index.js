@@ -22,7 +22,7 @@ var commielandChannelId = 819571978271981578;
 
 var memeChannel, memeChannelDebugOutput, botMusicChannel, commielandChannel;
 
-var memeJob, cleanJob, leaderboardJob;
+var memeJob, cleanJob, leaderboardJob,optimizeJob;
 
 var commandsArray = [
      {
@@ -80,7 +80,7 @@ client.on('ready', () => {
     checkIfCurrencyFileExists();
     if(!refreshMemeOptimization)
         checkIfOptimizeIndexesExists();
-
+	
     client.user.setActivity('kentushelp', { type: 'PLAYING' });
 	client.guilds.forEach((guild) => {
         server = guild;
@@ -99,7 +99,12 @@ client.on('ready', () => {
         });
     });
     console.log(" -------------- Logged in as " + client.user.username + " in " + server + " -------------- ");
-
+	
+	
+	/* call OptimizeMemes sunday once a week at 15h */
+	optimizeJob = new cron.CronJob('00 15 * * 0', OptimizeMemes);
+	optimizeJob.start();
+	
     /* Call GetMemeFromAYearAgo everyday at 09:00, 13:00 and 21:00 */
 	memeJob = new cron.CronJob('00 00 8,13,20 * * *', GetMemeFromAYearAgo);
 	memeJob.start();
@@ -111,6 +116,8 @@ client.on('ready', () => {
     /* Call leaderboard the 1 of every month */
 	leaderboardJob = new cron.CronJob('00 00 12 1 * *', DisplayEmojiLeaderBoard)
 	leaderboardJob.start();
+	
+	
 });
 
 /* ----------------- ON MESSAGE EVENT ----------------- */
@@ -276,6 +283,13 @@ client.on('message', async msg => {
 
 /* ----------------- MEME FUNCTIONS ----------------- */
 
+/* add the last message id from memechannel to the optimization file */
+function OptimizeMemes(){
+	//console.log(optimizeIndexes);
+	optimizeIndexes.unshift({snowflake : memeChannel.lastMessageID , date : Discord.SnowflakeUtil.deconstruct(memeChannel.lastMessageID).date});
+	writeOptimizationFile();
+}
+
 /* Reset indexes used with jobs */
 function CleanIndexes()
 {
@@ -314,7 +328,7 @@ function GetMemeFromDate(msg)
     }
 
     date.setDate(d);
-    date.setMonth(m - 1);
+    date.setMonth(m-1);
     date.setFullYear(y);
 
     console.log(" - Getting memes from " + date);
