@@ -289,7 +289,7 @@ function OptimizeMemes(){
 	optimizeIndexes.unshift({snowflake : memeChannel.lastMessageID , date : Discord.SnowflakeUtil.deconstruct(memeChannel.lastMessageID).date});
 	writeOptimizationFile();
 }
-s
+
 /* Reset indexes used with jobs */
 function CleanIndexes()
 {
