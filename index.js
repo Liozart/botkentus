@@ -289,7 +289,7 @@ function OptimizeMemes(){
 	optimizeIndexes.unshift({snowflake : memeChannel.lastMessageID , date : Discord.SnowflakeUtil.deconstruct(memeChannel.lastMessageID).date});
 	writeOptimizationFile();
 }
-
+s
 /* Reset indexes used with jobs */
 function CleanIndexes()
 {
@@ -370,6 +370,7 @@ function sendRandomFileFromDate(msgOffsetId, aDate, putInArray, isAutoJob)
 {
     var msgLimit = 100;
     var put = true;
+    var displayDate = aDate.getDate() + "/" + (parseInt(aDate.getMonth()) + 1) + "/" + aDate.getFullYear();
 
     memeChannel.fetchMessages({limit: msgLimit, before: msgOffsetId}).then(messages => {
         messages = messages.array();
@@ -392,7 +393,7 @@ function sendRandomFileFromDate(msgOffsetId, aDate, putInArray, isAutoJob)
                 {
                     console.log(" - " + msgCount + " messages that day.");
                     var rand = Math.floor(Math.random() * msgCount);
-                    var displayDate = aDate.getDate() + "/" + (parseInt(aDate.getMonth()) + 1) + "/" + aDate.getFullYear();
+
                     if (putInArray)
                     {
                         var dateid = aDate.getDate() + "." + aDate.getMonth() + "." + aDate.getFullYear();
