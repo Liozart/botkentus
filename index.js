@@ -400,7 +400,7 @@ function sendRandomFileFromDate(msgOffsetId, aDate, putInArray, isAutoJob)
                         if (!sentMemesIndex.has(dateid))
                             sentMemesIndex.set(dateid, []);
                         console.log("--------------------------------");
-                        if (sentMemesIndex.get(dateid).includes(rand) && sentMemesIndex.get(dateid).length >= msgCount)
+                        if (sentMemesIndex.get(dateid).includes(rand) || sentMemesIndex.get(dateid).length >= msgCount)
                             put = false;
                         else
                         {
